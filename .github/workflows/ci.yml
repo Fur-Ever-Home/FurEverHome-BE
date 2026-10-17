@@ -1,0 +1,49 @@
+
+name: Backend CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if Maven project exists
+        id: project
+        run: |
+          if [ -f pom.xml ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Java 21
+        if: steps.project.outputs.exists == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build and test
+        if: steps.project.outputs.exists == 'true'
+        run: mvn --batch-mode verify
+
+      - name: Wait for backend project
+        if: steps.project.outputs.exists == 'false'
+        run: echo "Backend project not uploaded yet. Build check will run once pom.xml is added."
