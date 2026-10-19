@@ -1,5 +1,5 @@
-
-name: Backend CI and Deploy
+```yaml
+name: Backend CI
 
 on:
   pull_request:
@@ -13,7 +13,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   build:
@@ -48,31 +47,4 @@ jobs:
       - name: Wait for backend project
         if: steps.project.outputs.exists == 'false'
         run: echo "Backend project not uploaded yet. Build check will run once pom.xml is added."
-
-  deploy-staging:
-    name: Deploy to staging
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.build.result == 'success'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
-          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
-
-      - name: Set up Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Build and deploy to Cloud Run
-        run: |
-          gcloud run deploy fureverhome-backend-staging \
-            --source . \
-            --project "${{ vars.GCP_PROJECT_ID }}" \
-            --region europe-central2 \
-            --allow-unauthenticated
+```
