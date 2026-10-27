@@ -1,49 +1,38 @@
-
-name: Backend CI
+name: Java Backend CI
 
 on:
-  pull_request:
-    branches:
-      - develop
-      - main
   push:
     branches:
       - develop
       - main
-
-permissions:
-  contents: read
+  pull_request:
+    branches:
+      - develop
+      - main
 
 jobs:
   build:
-    name: Build and test
+    name: Build & Test Java
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check if Maven project exists
-        id: project
-        run: |
-          if [ -f pom.xml ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Set up Java 21
-        if: steps.project.outputs.exists == 'true'
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: Build and test
-        if: steps.project.outputs.exists == 'true'
-        run: mvn --batch-mode verify
-
-      - name: Wait for backend project
-        if: steps.project.outputs.exists == 'false'
-        run: echo "Backend project not uploaded yet. Build check will run once pom.xml is added."
+      - name: Build and Test with Maven or Gradle
+        run: |
+          if [ -f pom.xml ]; then
+            echo "Proiect Maven detectat."
+            if [ -f mvnw ]; then chmod +x mvnw && ./mvnw clean package; else mvn clean package; fi
+          elif [ -f build.gradle ] || [ -f build.gradle.kts ]; then
+            echo "Proiect Gradle detectat."
+            if [ -f gradlew ]; then chmod +x gradlew && ./gradlew build; else gradle build; fi
+          else
+            echo "Nu a fost găsit încă un proiect Java (lipsesc pom.xml și build.gradle)."
+          fi
