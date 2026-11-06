@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: furerverhome-be
+    env: maven
+    buildCommand: ./mvnw clean install -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://dpg-dbn289mgekts738mv4ag-a/furerverhome_db
+      - key: SPRING_DATASOURCE_USERNAME
+        value: furerverhome_db_user
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: N0IXc1mYBQW83q68DAOlwLB2NHt8QGIu
