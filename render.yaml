@@ -1,7 +1,7 @@
 services:
   - type: web
     name: furerverhome-be
-    env: maven
+    runtime: java
     buildCommand: ./mvnw clean install -DskipTests
     startCommand: java -jar target/*.jar
     envVars:
