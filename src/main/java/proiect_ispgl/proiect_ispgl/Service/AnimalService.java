@@ -8,6 +8,8 @@ import proiect_ispgl.proiect_ispgl.Repository.AnimalRepository;
 import proiect_ispgl.proiect_ispgl.Repository.FisaMedicalaRepository;
 import proiect_ispgl.proiect_ispgl.Repository.ImagineAnimalRepository;
 import proiect_ispgl.proiect_ispgl.dto.AnimalResponseDto;
+import proiect_ispgl.proiect_ispgl.Model.CentruAnimale;
+import proiect_ispgl.proiect_ispgl.Repository.CentruAnimaleRepository;
 
 import java.text.Normalizer;
 import java.util.List;
@@ -19,12 +21,14 @@ public class AnimalService {
     private final AnimalRepository animalRepository;
     private final FisaMedicalaRepository fisaMedicalaRepository;
     private final ImagineAnimalRepository imagineAnimalRepository;
+    private final CentruAnimaleRepository centruAnimaleRepository;
 
-    public AnimalService(AnimalRepository animalRepository, FisaMedicalaRepository fisaMedicalaRepository, ImagineAnimalRepository imagineAnimalRepository)
+    public AnimalService(AnimalRepository animalRepository, FisaMedicalaRepository fisaMedicalaRepository, ImagineAnimalRepository imagineAnimalRepository, CentruAnimaleRepository centruAnimaleRepository)
     {
         this.animalRepository = animalRepository;
         this.fisaMedicalaRepository = fisaMedicalaRepository;
         this.imagineAnimalRepository = imagineAnimalRepository;
+        this.centruAnimaleRepository = centruAnimaleRepository;
     }
 
     /*public AnimalService(AnimalRepository animalRepository)
@@ -96,7 +100,7 @@ public class AnimalService {
                 .gender(animal.getGender())
                 .age(animal.getAge())
                 .size(animal.getSize())
-                .shelter("Centrul #" + (animal.getCenterId() != null ? animal.getCenterId() : "1"))
+                .shelter("Centrul #" + (centre_animale.getnumecentru() != null ? animal.getCenterId() : "1"))
                 .imageUrl(photoUrl)
                 .vaccinated(isVaccinated)
                 .dewormed(isDewormed)
@@ -206,9 +210,21 @@ public class AnimalService {
                 .map(ImagineAnimal::getImageUrl)
                 .orElse(null);
 
-        String shelterDisplay = (animal.getShelterName() != null && !animal.getShelterName().trim().isEmpty())
-                ? animal.getShelterName()
-                : "Centrul #" + (animal.getCenterId() != null ? animal.getCenterId() : "1");
+        // 3. Caută numele centrului în tabela centre_animale după centerId
+        String shelterDisplay = null;
+
+        if (animal.getCenterId() != null) {
+            shelterDisplay = centruAnimaleRepository.findById(animal.getCenterId())
+                    .map(CentruAnimale::getNumeCentru)
+                    .orElse(null);
+        }
+
+        // Dacă nu s-a găsit în centre_animale, verifică shelterName sau pune fallback-ul
+        if (shelterDisplay == null || shelterDisplay.trim().isEmpty()) {
+            shelterDisplay = (animal.getShelterName() != null && !animal.getShelterName().trim().isEmpty())
+                    ? animal.getShelterName()
+                    : "Centrul #" + (animal.getCenterId() != null ? animal.getCenterId() : "1");
+        }
 
         return AnimalResponseDto.builder()
                 .id(animal.getId())
