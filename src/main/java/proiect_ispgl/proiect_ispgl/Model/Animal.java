@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -83,5 +84,14 @@ public class Animal {
 
         @Column(name = "procent_sustinere_lunara")
         private Integer fundingPercent;
+
+        @Column(name = "descriere_ro", columnDefinition = "text")
+        private String description;
+
+        @Column(name = "descriere_en", columnDefinition = "text")
+        private String descriptionEn;
+
+        @Column(name = "necesar_donatii_lunar", precision = 12, scale = 2)
+        private BigDecimal monthlyDonationTarget;
 
     }

@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Entity
 @Table(name = "fisa_medicala")
@@ -30,5 +29,14 @@ public class FisaMedicala {
 
     @Column(name = "este_deparazitat")
     private Boolean isDewormed;
+
+    @Column(name = "are_microcip")
+    private Boolean microchipped;
+
+    @Column(name = "alergii_afectiuni", columnDefinition = "text")
+    private String allergiesAndConditions;
+
+    @Column(name = "stare_sanatate")
+    private String healthStatus;
 
 }

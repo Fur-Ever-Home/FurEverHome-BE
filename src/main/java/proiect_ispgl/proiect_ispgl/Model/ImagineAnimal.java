@@ -25,6 +25,6 @@ public class ImagineAnimal {
     private String imageUrl;
 
     @Column(name = "este_principala")
-    private boolean isMain;
+    private Boolean isMain;
 
 }
