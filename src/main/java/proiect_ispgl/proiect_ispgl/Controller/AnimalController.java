@@ -18,6 +18,11 @@ public class AnimalController {
         this.animalService = animalService;
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AnimalResponseDto> getAnimal(@PathVariable Long id) {
+        return ResponseEntity.ok(animalService.getAnimal(id));
+    }
+
     @GetMapping
     public ResponseEntity<List<AnimalResponseDto>> getAnimals(
             @RequestParam(required = false) String adoptionType,

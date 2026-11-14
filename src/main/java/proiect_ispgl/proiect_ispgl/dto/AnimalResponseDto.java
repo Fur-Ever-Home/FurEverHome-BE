@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -34,6 +36,22 @@ public class AnimalResponseDto {
     private String adoptionType;
     private String needType;
     private Integer fundingPercent;
+    private Integer calculatedFundingPercent;
     private LocalDateTime createdAt;
+    private String description;
+    private String descriptionEn;
+    private Boolean isDistanceAdoption;
+    private boolean apartmentFriendly;
+    private boolean houseFriendly;
+    private Boolean microchipped;
+    private String allergiesAndConditions;
+    private String healthStatus;
+    private List<String> images;
+    private List<MedicalTreatmentDto> treatments;
+    private BigDecimal monthlyDonationTarget;
+    private BigDecimal fundedAmount;
+    private BigDecimal remainingAmount;
+    private String fundingMonth;
+    private boolean fundingTargetConfigured;
 
 }
