@@ -128,12 +128,29 @@ class AnimalServiceTest {
                 () -> assertEquals(List.of(treatment), dto.getTreatments()),
                 () -> assertEquals(List.of("main.jpg", "secondary.jpg"), dto.getImages()),
                 () -> assertEquals("main.jpg", dto.getImageUrl()),
-                () -> assertEquals(40, dto.getFundingPercent()),
+                () -> assertEquals(99, dto.getFundingPercent()),
+                () -> assertEquals(40, dto.getCalculatedFundingPercent()),
                 () -> assertEquals(new BigDecimal("200.00"), dto.getMonthlyDonationTarget()),
                 () -> assertEquals(new BigDecimal("80.00"), dto.getFundedAmount()),
                 () -> assertEquals(new BigDecimal("120.00"), dto.getRemainingAmount()),
                 () -> assertTrue(dto.isFundingTargetConfigured())
         );
+    }
+
+    @Test
+    void displayedPercentageTracksDatabaseValueOnEachReadIncludingZeroAndNull() {
+        Animal animal = animal(52L, "distanta");
+        when(animals.findById(52L)).thenReturn(Optional.of(animal));
+        when(animals.findAll()).thenReturn(List.of(animal));
+        when(funding.getFunding(List.of(animal))).thenReturn(Map.of(52L,
+                new AnimalFundingDto("2026-11", null, BigDecimal.ZERO, null, 0, false)));
+
+        for (Integer percent : new Integer[]{15, 10, 20, 0, null}) {
+            animal.setFundingPercent(percent);
+            assertEquals(percent, service.getAnimal(52L).getFundingPercent());
+            assertEquals(percent, list("la_distanta").getFirst().getFundingPercent());
+            assertNull(service.getAnimal(52L).getCalculatedFundingPercent());
+        }
     }
 
     @Test

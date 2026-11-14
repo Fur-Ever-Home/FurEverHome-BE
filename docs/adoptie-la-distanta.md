@@ -21,21 +21,23 @@ Fiecare tratament conține `id`, `name`, `category`, `description`, `recordedAt`
 - `donatii_bani.status_plata`: doar valoarea exactă `confirmata` este inclusă în calcul. Se setează de fluxul de plată de încredere după confirmare. Valorile NULL, `in_asteptare`, `esuata` și `rambursata` sunt excluse. Nu se deduce succesul doar din existența unui ID Stripe.
 - `data_donatie`: data plății, interpretată în fusul configurat; coloana existentă este timestamp fără fus orar.
 
-Pentru adopția la distanță, API-ul expune `monthlyDonationTarget`, `fundedAmount`, `remainingAmount`, `fundingPercent`, `fundingMonth` (YYYY-MM), `fundingTargetConfigured`.
+`fundingPercent` reproduce valoarea din `animale.procent_sustinere_lunara`, pentru fiecare animal, la fiecare citire. Nu este înlocuit cu o valoare demonstrativă sau cu procentul calculat din donații. O modificare în baza de date devine vizibilă la următoarea încărcare a datelor în site.
+
+Pentru adopția la distanță, API-ul expune suplimentar `monthlyDonationTarget`, `fundedAmount`, `remainingAmount`, `calculatedFundingPercent`, `fundingMonth` (YYYY-MM), `fundingTargetConfigured`.
 
 Se însumează sumele pozitive confirmate pentru animal, între începutul lunii inclusiv și începutul lunii următoare exclusiv. Fus implicit `Europe/Bucharest`, configurabil prin `app.funding.time-zone`.
 
-`fundingPercent = min(100, floor(100 × fundedAmount / monthlyDonationTarget))`.
+`calculatedFundingPercent = min(100, floor(100 × fundedAmount / monthlyDonationTarget))`.
 
-Suma rămasă nu coboară sub zero; totalul încasat rămâne vizibil integral. Fără necesar configurat, `fundingTargetConfigured=false`, `remainingAmount=null`, procentul este 0. Procentul de test din `procent_sustinere_lunara` nu este folosit pentru adopțiile la distanță. Calculul este refăcut la fiecare citire, fără actualizări periodice în DB.
+Suma rămasă nu coboară sub zero; totalul încasat rămâne vizibil integral. Fără necesar configurat, `fundingTargetConfigured=false`, `remainingAmount=null`, `calculatedFundingPercent=null`. Calculul este refăcut la fiecare citire, fără actualizări periodice în DB. Nu modifică procentul afișat din coloana existentă.
 
 Această modificare citește donațiile; nu implementează checkout Stripe sau webhook de plată. Fluxul de plată trebuie să înregistreze animalul, data și starea de plată și să păstreze protecția existentă contra înregistrării duble a aceleiași tranzacții.
 
 ## Integrarea frontendului
 
-Frontendul existent primește și noile date prin lista de animale. Pop-up-ul actual nu randează secțiunile noi de tratament/necesar/sumă strânsă. Pentru afișarea lor trebuie conectate ulterior câmpurile din acest contract. Frontendul nu a fost modificat.
+Frontendul primește datele prin lista de animale. Pop-up-ul actual nu randează secțiunile noi de tratament/necesar/sumă strânsă. Pentru afișarea lor trebuie conectate ulterior câmpurile din acest contract.
 
-Cardul existent folosește `fundingPercent || 45`; acesta afișează eronat 45 în loc de un procent real de 0. La integrarea frontendului trebuie folosit `fundingPercent ?? 0`.
+Cardul folosește acum `fundingPercent ?? 0`; păstrează procentul real de 0 și nu introduce valoarea 45. Actualizarea datelor se vede după reîncărcarea paginii; nu există un flux live de notificări din DB.
 
 ## Verificare
 

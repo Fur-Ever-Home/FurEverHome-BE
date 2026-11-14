@@ -36,6 +36,7 @@ public class AnimalResponseDto {
     private String adoptionType;
     private String needType;
     private Integer fundingPercent;
+    private Integer calculatedFundingPercent;
     private LocalDateTime createdAt;
     private String description;
     private String descriptionEn;

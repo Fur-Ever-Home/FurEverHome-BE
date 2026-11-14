@@ -117,11 +117,10 @@ public class AnimalService {
                     .adoptionType(animal.getAdoptionType())
                     .isDistanceAdoption(isDistanceAdoption(animal.getAdoptionType()))
                     .needType(animal.getNeedType()).createdAt(animal.getCreatedAt())
-                    // Do not use the stored test percentage for distance adoption.
-                    .fundingPercent(isDistanceAdoption(animal.getAdoptionType())
-                            ? Integer.valueOf(0) : animal.getFundingPercent());
+                    // The displayed percentage is the value maintained in the database.
+                    .fundingPercent(animal.getFundingPercent());
             if (support != null) {
-                dto.fundingPercent(support.percent())
+                dto.calculatedFundingPercent(support.targetConfigured() ? support.percent() : null)
                         .monthlyDonationTarget(support.monthlyTarget()).fundedAmount(support.fundedAmount())
                         .remainingAmount(support.remainingAmount()).fundingMonth(support.month())
                         .fundingTargetConfigured(support.targetConfigured());
