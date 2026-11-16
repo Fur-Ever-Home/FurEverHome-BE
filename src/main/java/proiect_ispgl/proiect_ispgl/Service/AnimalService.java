@@ -50,16 +50,29 @@ public class AnimalService {
             String adoptionType, String species, String gender, String ageGroup,
             String locationType, String temperament, String color, String size,
             String shelter, Boolean petFriendly, Boolean childFriendly,
-            Boolean vaccinated, Boolean dewormed, Boolean sterilized) {
-        List<Animal> animals = animalRepository.findAll().stream()
+            Boolean vaccinated, Boolean dewormed, Boolean sterilized, Integer limit) {
+
+        var stream = animalRepository.findAll().stream()
                 .filter(animal -> matchesAdoptionType(animal.getAdoptionType(), adoptionType))
-                .toList();
-        return mapAnimals(animals).stream()
-                .filter(dto -> matchesExactIgnoreDiacritics(dto.getSpecies(), species))
+                .filter(animal -> matchesSpecies(animal.getSpecies(), species));
+
+        boolean noOtherFilters = gender == null && ageGroup == null &&
+                locationType == null && temperament == null && color == null &&
+                size == null && shelter == null && petFriendly == null &&
+                childFriendly == null && vaccinated == null && dewormed == null && sterilized == null;
+
+        if (limit != null && limit > 0 && noOtherFilters) {
+            stream = stream.limit(limit);
+        }
+
+        List<Animal> animals = stream.toList();
+
+        var resultStream = mapAnimals(animals).stream()
+                .filter(dto -> matchesSpecies(dto.getSpecies(), species))
                 .filter(dto -> matchesExactIgnoreDiacritics(dto.getGender(), gender))
                 .filter(dto -> matchesExactIgnoreDiacritics(dto.getAgeGroup(), ageGroup))
                 .filter(dto -> matchesContainsIgnoreDiacritics(dto.getLocationType(), locationType))
-                .filter(dto -> matchesExactIgnoreDiacritics(dto.getTemperament(), temperament))
+                .filter(dto -> matchesTemperament(dto.getTemperament(), temperament))
                 .filter(dto -> matchesColor(dto.getColor(), color))
                 .filter(dto -> matchesExactIgnoreDiacritics(dto.getSize(), size))
                 .filter(dto -> matchesContainsIgnoreDiacritics(dto.getShelter(), shelter))
@@ -68,8 +81,13 @@ public class AnimalService {
                 .filter(dto -> !Boolean.TRUE.equals(vaccinated) || dto.isVaccinated())
                 .filter(dto -> !Boolean.TRUE.equals(dewormed) || dto.isDewormed())
                 .filter(dto -> !Boolean.TRUE.equals(sterilized) || dto.isSterilized())
-                .sorted((a1, a2) -> Integer.compare(extractAgeInMonths(a2.getAge()), extractAgeInMonths(a1.getAge())))
-                .toList();
+                .sorted((a1, a2) -> Integer.compare(extractAgeInMonths(a2.getAge()), extractAgeInMonths(a1.getAge())));
+
+        if (limit != null && limit > 0) {
+            resultStream = resultStream.limit(limit);
+        }
+
+        return resultStream.toList();
     }
 
     private List<AnimalResponseDto> mapAnimals(List<Animal> animals) {
@@ -117,7 +135,6 @@ public class AnimalService {
                     .adoptionType(animal.getAdoptionType())
                     .isDistanceAdoption(isDistanceAdoption(animal.getAdoptionType()))
                     .needType(animal.getNeedType()).createdAt(animal.getCreatedAt())
-                    // The displayed percentage is the value maintained in the database.
                     .fundingPercent(animal.getFundingPercent());
             if (support != null) {
                 dto.calculatedFundingPercent(support.targetConfigured() ? support.percent() : null)
@@ -135,7 +152,8 @@ public class AnimalService {
 
     private boolean matchesAdoptionType(String dbValue, String filterValue) {
         String filter = normalize(filterValue);
-        if (filter.isEmpty() || filter.equals("all")) return true;
+        if (filter.equals("all")) return true;
+        if (filter.isEmpty()) return !isDistanceAdoption(dbValue);
         if (Set.of("distanta", "la_distanta", "la distanta").contains(filter)) return isDistanceAdoption(dbValue);
         return normalize(dbValue).equals(filter);
     }
@@ -154,6 +172,46 @@ public class AnimalService {
     private boolean matchesContainsIgnoreDiacritics(String dbValue, String filterValue) {
         if (filterValue == null || filterValue.trim().isEmpty()) return true;
         return normalize(dbValue).contains(normalize(filterValue));
+    }
+
+    private boolean matchesSpecies(String dbSpecies, String filterSpecies) {
+        if (filterSpecies == null || filterSpecies.trim().isEmpty() || filterSpecies.equalsIgnoreCase("all")) return true;
+        String normDb = normalize(dbSpecies);
+        String normFilter = normalize(filterSpecies);
+
+        if (normFilter.startsWith("cain") || normFilter.startsWith("dog")) {
+            return normDb.startsWith("cain") || normDb.startsWith("dog");
+        }
+        if (normFilter.startsWith("pisic") || normFilter.startsWith("cat")) {
+            return normDb.startsWith("pisic") || normDb.startsWith("cat");
+        }
+        if (normFilter.contains("alte") || normFilter.contains("other")) {
+            return !normDb.startsWith("cain") && !normDb.startsWith("pisic");
+        }
+        return normDb.equals(normFilter);
+    }
+
+    private boolean matchesTemperament(String dbTemp, String filterTemp) {
+        if (filterTemp == null || filterTemp.trim().isEmpty() || filterTemp.equalsIgnoreCase("all")) return true;
+        String normDb = normalize(dbTemp);
+        String normFilter = normalize(filterTemp);
+
+        if (normFilter.contains("jucaus") || normFilter.contains("playful")) return normDb.contains("jucaus");
+        if (normFilter.contains("bland") || normFilter.contains("gentle")) return normDb.contains("bland");
+        if (normFilter.contains("energic") || normFilter.contains("energetic") || normFilter.contains("activ")) {
+            return normDb.contains("energic") || normDb.contains("energie") || normDb.contains("activ");
+        }
+        if (normFilter.contains("calm") || normFilter.contains("linistit") || normFilter.contains("quiet")) {
+            return normDb.contains("calm") || normDb.contains("linistit") || normDb.contains("pasnic");
+        }
+        if (normFilter.contains("prietenos") || normFilter.contains("friendly")) return normDb.contains("prietenos");
+        if (normFilter.contains("sociabil") || normFilter.contains("sociable")) return normDb.contains("sociabil");
+        if (normFilter.contains("timid") || normFilter.contains("shy")) return normDb.contains("timid");
+        if (normFilter.contains("afectuos") || normFilter.contains("iubitor") || normFilter.contains("affectionate")) {
+            return normDb.contains("afectuos") || normDb.contains("afectuoasa") || normDb.contains("iubitor") || normDb.contains("iubitoare");
+        }
+
+        return normDb.contains(normFilter);
     }
 
     private boolean matchesColor(String dbColor, String filterColor) {
