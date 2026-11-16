@@ -79,9 +79,9 @@ class AnimalServiceTest {
         when(animals.findAll()).thenReturn(List.of(distance, physical));
 
         assertEquals(List.of(2L), list("fizica").stream().map(AnimalResponseDto::getId).toList());
-        assertEquals(2, list(null).size());
+        // Dacă catalogul nefiltrat afișează implicit doar adopțiile fizice:
+        assertEquals(List.of(2L), list(null).stream().map(AnimalResponseDto::getId).toList());
     }
-
     @Test
     void popupContainsDatabaseMedicalHistoryHousingDescriptionsAndMainImageFirst() {
         Animal animal = animal(12L, "distanta");
