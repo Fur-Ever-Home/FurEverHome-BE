@@ -38,12 +38,13 @@ public class AnimalController {
             @RequestParam(required = false) Boolean childFriendly,
             @RequestParam(required = false) Boolean vaccinated,
             @RequestParam(required = false) Boolean dewormed,
-            @RequestParam(required = false) Boolean sterilized
+            @RequestParam(required = false) Boolean sterilized,
+            @RequestParam(required = false) Integer limit
     ) {
         List<AnimalResponseDto> animals = animalService.getAnimals(
                 adoptionType, species, gender, ageGroup, locationType,
                 temperament, color, size, shelter, petFriendly,
-                childFriendly, vaccinated, dewormed, sterilized
+                childFriendly, vaccinated, dewormed, sterilized, limit
         );
         return ResponseEntity.ok(animals);
     }

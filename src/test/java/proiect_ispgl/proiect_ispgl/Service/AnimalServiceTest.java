@@ -228,7 +228,7 @@ class AnimalServiceTest {
 
     private List<AnimalResponseDto> list(String adoptionType) {
         return service.getAnimals(adoptionType, null, null, null, null, null, null,
-                null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null);
     }
 
     private Animal animal(Long id, String adoptionType) {
