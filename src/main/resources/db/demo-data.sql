@@ -1,3 +1,18 @@
+-- These tables are queried with JDBC and are not created by Hibernate.
+CREATE TABLE IF NOT EXISTS tratamente (
+    id_tratament INTEGER PRIMARY KEY,
+    nume_tratament VARCHAR(100),
+    categorie VARCHAR(100),
+    descriere TEXT
+);
+
+CREATE TABLE IF NOT EXISTS inregistrari_medicale (
+    nr_fisa BIGINT REFERENCES fisa_medicala(nr_fisa),
+    id_tratament INTEGER REFERENCES tratamente(id_tratament),
+    data_inregistrarii DATE,
+    PRIMARY KEY (nr_fisa, id_tratament)
+);
+
 INSERT INTO animale (
     nume, specie, rasa, varsta, sex, talie, status, tip_locatie, nume_centru,
     data_adaugare, temperament, tip_adoptie, descriere_ro, descriere_en
