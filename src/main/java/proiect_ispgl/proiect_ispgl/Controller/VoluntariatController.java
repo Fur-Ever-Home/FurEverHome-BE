@@ -1,7 +1,6 @@
 package proiect_ispgl.proiect_ispgl.Controller;
 
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
@@ -16,19 +15,9 @@ public class VoluntariatController {
     private final CerereVoluntariatRepository repository;
     private final JavaMailSender mailSender;
 
-    private final boolean notificationsEnabled;
-    private final String notificationRecipient;
-
-    public VoluntariatController(
-            CerereVoluntariatRepository repository,
-            JavaMailSender mailSender,
-            @Value("${app.mail.notifications.enabled}") boolean notificationsEnabled,
-            @Value("${app.mail.volunteer-to}") String notificationRecipient
-    ) {
+    public VoluntariatController(CerereVoluntariatRepository repository, JavaMailSender mailSender) {
         this.repository = repository;
         this.mailSender = mailSender;
-        this.notificationsEnabled = notificationsEnabled;
-        this.notificationRecipient = notificationRecipient;
     }
 
     @PostMapping
@@ -36,13 +25,9 @@ public class VoluntariatController {
         // 1. Salvează cererea în baza de date Neon
         CerereVoluntariat salvata = repository.save(cerere);
 
-        if (!notificationsEnabled) {
-            return salvata;
-        }
-
         // 2. Trimite email de notificare către tine (echipa / fundația)
         SimpleMailMessage mesajAdmin = new SimpleMailMessage();
-        mesajAdmin.setTo(notificationRecipient);
+        mesajAdmin.setTo("diensoarec@gmail.com");
         mesajAdmin.setSubject("Cerere nouă de voluntariat: " + cerere.getNumeComplet());
         mesajAdmin.setText(
                 "Ai primit o nouă înscriere în echipă!\n\n" +

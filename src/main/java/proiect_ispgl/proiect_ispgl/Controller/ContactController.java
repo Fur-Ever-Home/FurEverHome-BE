@@ -1,6 +1,5 @@
 package proiect_ispgl.proiect_ispgl.Controller;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
@@ -15,19 +14,9 @@ public class ContactController {
     private final MesajContactRepository repository;
     private final JavaMailSender mailSender;
 
-    private final boolean notificationsEnabled;
-    private final String notificationRecipient;
-
-    public ContactController(
-            MesajContactRepository repository,
-            JavaMailSender mailSender,
-            @Value("${app.mail.notifications.enabled}") boolean notificationsEnabled,
-            @Value("${app.mail.contact-to}") String notificationRecipient
-    ) {
+    public ContactController(MesajContactRepository repository, JavaMailSender mailSender) {
         this.repository = repository;
         this.mailSender = mailSender;
-        this.notificationsEnabled = notificationsEnabled;
-        this.notificationRecipient = notificationRecipient;
     }
 
     @PostMapping
@@ -35,13 +24,9 @@ public class ContactController {
         // 1. Salvează mesajul în baza de date Neon
         MesajContact salvat = repository.save(contact);
 
-        if (!notificationsEnabled) {
-            return salvat;
-        }
-
         // 2. Trimite email de notificare doar către voi
         SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(notificationRecipient);
+        mail.setTo("diensoarec@gmail.com");
         mail.setSubject("Mesaj nou pe site [" + contact.getSubiect() + "] - de la " + contact.getNume());
         mail.setText(
                 "Ai primit un mesaj nou prin formularul de contact!\n\n" +
