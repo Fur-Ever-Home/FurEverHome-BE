@@ -54,6 +54,16 @@ class AnimalServiceTest {
         when(funding.getFunding(anyCollection())).thenReturn(Map.of());
     }
 
+    @Test
+    void countReadsTheCurrentRepositoryTotalOnEachCall() {
+        when(animals.count()).thenReturn(0L, 56L);
+
+        assertEquals(0L, service.countAnimals());
+        assertEquals(56L, service.countAnimals());
+        verify(animals, times(2)).count();
+        verifyNoMoreInteractions(animals);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"distanta", "la_distanta", "la distanță", "  LA_DISTANTA  "})
     void distanceFilterAcceptsRequestAliasesButOnlyCanonicalDatabaseType(String alias) {
@@ -81,6 +91,29 @@ class AnimalServiceTest {
         assertEquals(List.of(2L), list("fizica").stream().map(AnimalResponseDto::getId).toList());
         // Dacă catalogul nefiltrat afișează implicit doar adopțiile fizice:
         assertEquals(List.of(2L), list(null).stream().map(AnimalResponseDto::getId).toList());
+    }
+
+    @Test
+    void exactShelterFilterQueriesOnlyThatCenterBeforeApplyingOtherFiltersAndLimit() {
+        Animal younger = animal(1L, "fizica");
+        younger.setCenterId(8);
+        Animal older = animal(2L, "fizica");
+        older.setCenterId(8);
+        older.setAge("4 ani");
+        Animal distance = animal(3L, "distanta");
+        distance.setCenterId(8);
+        when(animals.findByCenterId(8)).thenReturn(List.of(younger, older, distance));
+        when(centers.findAllById(List.of(8))).thenReturn(List.of(new CentruAnimale(8, "Centru test")));
+
+        List<AnimalResponseDto> result = service.getAnimals(null, null, null, null,
+                null, null, null, null, null, 8, null, null, null, null, null, 1);
+
+        assertEquals(List.of(2L), result.stream().map(AnimalResponseDto::getId).toList());
+        assertEquals(8, result.getFirst().getShelterId());
+        assertEquals("Centru test", result.getFirst().getShelter());
+        verify(animals).findByCenterId(8);
+        verifyNoMoreInteractions(animals);
+        verify(medical).findByAnimalIdIn(List.of(1L, 2L));
     }
     @Test
     void popupContainsDatabaseMedicalHistoryHousingDescriptionsAndMainImageFirst() {
@@ -228,7 +261,7 @@ class AnimalServiceTest {
 
     private List<AnimalResponseDto> list(String adoptionType) {
         return service.getAnimals(adoptionType, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null);
     }
 
     private Animal animal(Long id, String adoptionType) {

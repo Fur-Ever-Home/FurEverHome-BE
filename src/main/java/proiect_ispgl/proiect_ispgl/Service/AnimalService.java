@@ -40,6 +40,10 @@ public class AnimalService {
         this.fundingService = fundingService;
     }
 
+    public long countAnimals() {
+        return animalRepository.count();
+    }
+
     public AnimalResponseDto getAnimal(Long id) {
         Animal animal = animalRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Animalul nu exista"));
@@ -49,16 +53,19 @@ public class AnimalService {
     public List<AnimalResponseDto> getAnimals(
             String adoptionType, String species, String gender, String ageGroup,
             String locationType, String temperament, String color, String size,
-            String shelter, Boolean petFriendly, Boolean childFriendly,
+            String shelter, Integer shelterId, Boolean petFriendly, Boolean childFriendly,
             Boolean vaccinated, Boolean dewormed, Boolean sterilized, Integer limit) {
 
-        var stream = animalRepository.findAll().stream()
+        List<Animal> candidates = shelterId == null
+                ? animalRepository.findAll()
+                : animalRepository.findByCenterId(shelterId);
+        var stream = candidates.stream()
                 .filter(animal -> matchesAdoptionType(animal.getAdoptionType(), adoptionType))
                 .filter(animal -> matchesSpecies(animal.getSpecies(), species));
 
         boolean noOtherFilters = gender == null && ageGroup == null &&
                 locationType == null && temperament == null && color == null &&
-                size == null && shelter == null && petFriendly == null &&
+                size == null && shelter == null && shelterId == null && petFriendly == null &&
                 childFriendly == null && vaccinated == null && dewormed == null && sterilized == null;
 
         if (limit != null && limit > 0 && noOtherFilters) {
@@ -118,7 +125,7 @@ public class AnimalService {
                     .breed(animal.getBreed()).status(animal.getStatus()).gender(animal.getGender())
                     .age(animal.getAge()).ageGroup(animal.getAgeGroup()).locationType(animal.getLocationType())
                     .temperament(animal.getTemperament()).color(animal.getColor()).size(animal.getSize())
-                    .shelter(shelterDisplay)
+                    .shelter(shelterDisplay).shelterId(animal.getCenterId())
                     .petFriendly(Boolean.TRUE.equals(animal.getPetFriendly()))
                     .childFriendly(Boolean.TRUE.equals(animal.getChildFriendly()))
                     .apartmentFriendly(Boolean.TRUE.equals(animal.getApartmentFriendly()))
