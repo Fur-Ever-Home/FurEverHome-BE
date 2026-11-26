@@ -27,6 +27,7 @@ public class AnimalResponseDto {
     private String color;
     private String size;
     private String shelter;
+    private Integer shelterId;
     private boolean petFriendly;
     private boolean childFriendly;
     private boolean vaccinated;

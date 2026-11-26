@@ -68,4 +68,25 @@ class AnimalControllerTest {
         mvc.perform(get("/api/animals/invalid")).andExpect(status().isBadRequest());
         verifyNoInteractions(service);
     }
+
+    @Test
+    void countEndpointReturnsNumericTotalWithoutResolvingAnAnimalId() throws Exception {
+        when(service.countAnimals()).thenReturn(56L);
+
+        mvc.perform(get("/api/animals/count"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(56));
+
+        verify(service).countAnimals();
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void animalListAcceptsAnExactShelterId() throws Exception {
+        mvc.perform(get("/api/animals").param("shelterId", "8"))
+                .andExpect(status().isOk());
+
+        verify(service).getAnimals(null, null, null, null, null, null, null, null,
+                null, 8, null, null, null, null, null, null);
+    }
 }

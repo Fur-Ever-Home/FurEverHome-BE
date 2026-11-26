@@ -16,4 +16,6 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
     List<Animal> findBySpeciesIgnoreCase(String species);
 
     List<Animal> findBySpeciesNotInIgnoreCase(Collection<String> excludedSpecies);
+
+    List<Animal> findByCenterId(Integer centerId);
 }

@@ -3,6 +3,7 @@ package proiect_ispgl.proiect_ispgl.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import proiect_ispgl.proiect_ispgl.Service.AnimalService;
+import proiect_ispgl.proiect_ispgl.dto.AnimalCountDto;
 import proiect_ispgl.proiect_ispgl.dto.AnimalResponseDto;
 
 import java.util.List;
@@ -16,6 +17,11 @@ public class AnimalController {
     public AnimalController(AnimalService animalService)
     {
         this.animalService = animalService;
+    }
+
+    @GetMapping("/count")
+    public AnimalCountDto getAnimalCount() {
+        return new AnimalCountDto(animalService.countAnimals());
     }
 
     @GetMapping("/{id}")
@@ -34,6 +40,7 @@ public class AnimalController {
             @RequestParam(required = false) String color,
             @RequestParam(required = false) String size,
             @RequestParam(required = false) String shelter,
+            @RequestParam(required = false) Integer shelterId,
             @RequestParam(required = false) Boolean petFriendly,
             @RequestParam(required = false) Boolean childFriendly,
             @RequestParam(required = false) Boolean vaccinated,
@@ -43,7 +50,7 @@ public class AnimalController {
     ) {
         List<AnimalResponseDto> animals = animalService.getAnimals(
                 adoptionType, species, gender, ageGroup, locationType,
-                temperament, color, size, shelter, petFriendly,
+                temperament, color, size, shelter, shelterId, petFriendly,
                 childFriendly, vaccinated, dewormed, sterilized, limit
         );
         return ResponseEntity.ok(animals);
