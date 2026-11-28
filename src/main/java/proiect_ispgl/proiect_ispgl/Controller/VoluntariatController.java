@@ -9,7 +9,6 @@ import proiect_ispgl.proiect_ispgl.Repository.CerereVoluntariatRepository;
 
 @RestController
 @RequestMapping("/api/voluntariat")
-@CrossOrigin(origins = "*") // Permite cererile din Frontend (React)
 public class VoluntariatController {
 
     private final CerereVoluntariatRepository repository;

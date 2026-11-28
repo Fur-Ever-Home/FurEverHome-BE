@@ -8,7 +8,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/donatii")
-@CrossOrigin(origins = "*")
 public class DonatiiController {
 
     private final DonatieBaniRepository repository;
