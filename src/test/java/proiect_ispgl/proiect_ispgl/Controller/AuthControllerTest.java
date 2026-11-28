@@ -102,7 +102,7 @@ public class AuthControllerTest {
         var namedJdbc = new NamedParameterJdbcTemplate(database);
         var repository = new UserRegistrationRepository(namedJdbc);
         mailSender = mock(JavaMailSender.class);
-        var approval = new ShelterApprovalService(repository, mailSender, "team@example.test", "no-reply@example.test",
+        var approval = new ShelterApprovalService(repository, mailSender::send, "team@example.test", "no-reply@example.test",
                 "http://localhost:8080", "test-only-signing-key-at-least-32-characters");
         var service = new AccountRegistrationService(repository, passwordEncoder,
                 new DataSourceTransactionManager(database), approval);
@@ -112,7 +112,7 @@ public class AuthControllerTest {
         resetClock = mock(Clock.class);
         when(resetClock.instant()).thenReturn(RESET_REQUEST_TIME);
         var reset = new PasswordResetService(new PasswordResetRepository(namedJdbc), passwordEncoder,
-                mailSender, Runnable::run, resetClock, "no-reply@example.test", "http://localhost:5173",
+                mailSender::send, Runnable::run, resetClock, "no-reply@example.test", "http://localhost:5173",
                 "reset-test-only-key-at-least-32-characters", 1200);
         mvc = MockMvcBuilders.standaloneSetup(new AuthController(service), new ShelterApprovalController(approval),
                 new AccountLoginController(login, sessions), new PasswordResetController(reset))

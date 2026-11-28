@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import proiect_ispgl.proiect_ispgl.Repository.UserRegistrationRepository;
 
@@ -30,13 +29,13 @@ public class ShelterApprovalService {
     private static final String HMAC = "HmacSHA256";
 
     private final UserRegistrationRepository users;
-    private final JavaMailSender mailSender;
+    private final AccountMailDelivery mailSender;
     private final String recipient;
     private final String sender;
     private final String baseUrl;
     private final String signingKey;
 
-    public ShelterApprovalService(UserRegistrationRepository users, JavaMailSender mailSender,
+    public ShelterApprovalService(UserRegistrationRepository users, AccountMailDelivery mailSender,
                                   @Value("${app.shelter-approval.recipient:}") String recipient,
                                   @Value("${app.shelter-approval.from:${spring.mail.username:}}") String sender,
                                   @Value("${app.shelter-approval.base-url:}") String baseUrl,
