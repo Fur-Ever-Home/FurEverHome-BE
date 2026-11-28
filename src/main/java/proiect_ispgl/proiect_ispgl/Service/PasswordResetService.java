@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import proiect_ispgl.proiect_ispgl.Repository.PasswordResetRepository;
@@ -37,7 +36,7 @@ public class PasswordResetService {
 
     private final PasswordResetRepository accounts;
     private final PasswordEncoder passwords;
-    private final JavaMailSender mail;
+    private final AccountMailDelivery mail;
     private final TaskExecutor executor;
     private final Clock clock;
     private final String sender;
@@ -47,7 +46,7 @@ public class PasswordResetService {
     private final boolean canSendMail;
     private final SecureRandom random = new SecureRandom();
 
-    public PasswordResetService(PasswordResetRepository accounts, PasswordEncoder passwords, JavaMailSender mail,
+    public PasswordResetService(PasswordResetRepository accounts, PasswordEncoder passwords, AccountMailDelivery mail,
                                 @Qualifier("passwordResetExecutor") TaskExecutor executor, Clock clock,
                                 @Value("${app.password-reset.from}") String sender,
                                 @Value("${app.password-reset.frontend-url}") String frontendUrl,

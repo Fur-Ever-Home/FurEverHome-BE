@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
+import org.springframework.session.web.http.SessionRepositoryFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -39,7 +40,7 @@ public class ApiSecurityConfiguration {
     @Bean
     public FilterRegistrationBean<ApiAccessFilter> apiAccessFilter(AccountSessionService sessions) {
         var registration = new FilterRegistrationBean<>(new ApiAccessFilter(sessions));
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        registration.setOrder(SessionRepositoryFilter.DEFAULT_ORDER + 1);
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         return registration;
     }

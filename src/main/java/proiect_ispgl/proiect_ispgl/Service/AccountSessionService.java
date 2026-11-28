@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import proiect_ispgl.proiect_ispgl.Repository.UserLoginRepository;
 import proiect_ispgl.proiect_ispgl.Service.AccountLoginService.AuthenticatedAccount;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -74,7 +76,10 @@ public class AccountSessionService {
         }
     }
 
-    public record AccountSession(AuthenticatedAccount account, String csrfToken) {
+    public record AccountSession(AuthenticatedAccount account, String csrfToken) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+
         public boolean matchesCsrfToken(String submitted) {
             return submitted != null && submitted.length() == csrfToken.length()
                     && MessageDigest.isEqual(csrfToken.getBytes(StandardCharsets.UTF_8),

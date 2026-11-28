@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import proiect_ispgl.proiect_ispgl.Repository.UserLoginRepository;
 import proiect_ispgl.proiect_ispgl.dto.AccountLoginRequest;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -54,7 +56,11 @@ public class AccountLoginService {
     }
 
     public record AuthenticatedAccount(long id, String role, String accountType, String email, String firstName,
-                                       String lastName, String shelterName, String passwordFingerprint) {}
+                                       String lastName, String shelterName,
+                                       String passwordFingerprint) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
+    }
 
     public enum LoginError {
         INVALID_LOGIN,
