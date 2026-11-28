@@ -1,5 +1,6 @@
 package proiect_ispgl.proiect_ispgl.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,26 +12,31 @@ public class DonatieBani {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_donatie")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer idDonatie;
 
     @Column(name = "id_centru")
     private Integer idCentru;
 
     @Column(name = "id_utilizator")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer idUtilizator;
 
     private BigDecimal suma;
 
     @Column(name = "id_tranzactie_stripe")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String idTranzactieStripe;
 
     @Column(name = "data_donatie")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dataDonatie = LocalDateTime.now();
 
     @Column(name = "id_animal")
     private Long idAnimal;
 
     @Column(name = "status_plata")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String statusPlata = "FINALIZATA";
 
     @Column(name = "nume_donator")

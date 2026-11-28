@@ -1,5 +1,6 @@
 package proiect_ispgl.proiect_ispgl.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,6 +11,7 @@ public class CerereVoluntariat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cerere")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long idCerere;
 
     @Column(name = "nume_complet")
@@ -30,6 +32,7 @@ public class CerereVoluntariat {
     private Boolean acordGdpr;
 
     @Column(name = "data_inscriere")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dataInscriere = LocalDateTime.now();
 
     public Long getIdCerere() {

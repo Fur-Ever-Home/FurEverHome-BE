@@ -1,5 +1,6 @@
 package proiect_ispgl.proiect_ispgl.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,6 +11,7 @@ public class MesajContact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_mesaj")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long idMesaj;
 
     private String nume;
@@ -21,6 +23,7 @@ public class MesajContact {
     private Boolean acordGdpr;
 
     @Column(name = "data_trimitere")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dataTrimitere = LocalDateTime.now();
 
     public Long getIdMesaj() {

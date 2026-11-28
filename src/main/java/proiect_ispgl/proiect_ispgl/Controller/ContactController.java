@@ -8,7 +8,6 @@ import proiect_ispgl.proiect_ispgl.Repository.MesajContactRepository;
 
 @RestController
 @RequestMapping("/api/contact")
-@CrossOrigin(origins = "*")
 public class ContactController {
 
     private final MesajContactRepository repository;
